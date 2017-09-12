@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="calvera_payment_securion.gateway.class">Omnipay\Securion\Gateway</parameter>
+        <parameter key="calvera_payment_securion.form.securion_type.class">Calvera\Payment\SecurionBundle\Form\SecurionType</parameter>
+        <parameter key="calvera_payment_securion.form.checkout_type.class">Calvera\Payment\SecurionBundle\Form\CheckoutType</parameter>
+        <parameter key="calvera_payment_securion.plugin.checkout.class">Calvera\Payment\SecurionBundle\Plugin\CheckoutPlugin</parameter>
+        <parameter key="calvera_payment_securion.api_key" />
+    </parameters>
+
+    <services>
+        <service id="calvera_payment_securion.gateway" class="%calvera_payment_securion.gateway.class%">
+            <argument>null</argument>
+            <argument type="service" id="request" on-invalid="null" strict="false" />
+            <call method="setApiKey">
+                <argument>%calvera_payment_securion.api_key%</argument>
+            </call>
+        </service>
+
+        <service id="calvera_payment_securion.plugin.checkout" class="%calvera_payment_securion.plugin.checkout.class%">
+            <argument type="service" id="calvera_payment_securion.gateway" />
+            <call method="setLogger">
+                <argument type="service" id="monolog.logger.calvera_payment_securion" />
+            </call>
+            <tag name="payment.plugin" />
+        </service>
+
+        <service id="monolog.logger.calvera_payment_securion" parent="monolog.logger_prototype">
+            <argument index="0">calvera_payment_securion</argument>
+        </service>
+    </services>
+</container>
